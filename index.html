@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="src/css/style.css">
+    <title>valor X hora</title>
+</head>
+<body id="dark_mode" class="theme_red">
+    <header>
+
+    </header>
+    <main>
+        <section id="sectionCreator">
+            
+            <article class="secCreator_container">
+               
+                <form class="secCreator_form" action="#">
+                    <h1>Crea una nueva tabla</h1>
+                    <label for="SecCretitulo">Título</label>
+                    <input id="SecCretitulo" class="textArea_createPanel" placeholder="Primer quincena (mes)" type="text">
+                    <button class="btn_createPanel genericBtn" type="submit">Crear</button>
+                </form>
+            </article>
+            <article class="secCreator_containerThemes">
+                <div class="secCreator_buttonsContainer">
+                    <button class="secCreator_btnColorGreen" data-color="Green"></button>
+                    <button class="secCreator_btnColorBlue" data-color="Blue"></button>
+                    <button class="secCreator_btnColorPink" data-color="Pink"></button>
+                    <button class="secCreator_btnColorRed" data-color="Red"></button>
+                </div>
+                <input type="checkbox" id="switch" class="secViewer_checkBox">
+                <label for="switch"></label>
+            </article>
+        </section>
+    
+        <section id="sectionViewer">
+            <article class="secViewer_containerValues">
+                <article class="secViewer_workinHours secViewer_article">
+                    <label class="secViewer_label" for="secViewer_valuesW">Valor Hora Laboral</label>
+                    <div>
+                        <label for="secViewer_valuesW">$</label>
+                        <input id="secViewer_valuesW" type="number" value="5000">
+                    </div>
+                </article>
+                <article class="secViewer_FestiveHours secViewer_article">
+                    <label class="secViewer_label" for="secViewer_valuesF">Valor Hora Festiva</label>
+                    <div>
+                        <label for="secViewer_valuesF">$</label>
+                        <input id="secViewer_valuesF" type="number" value="5500">
+                    </div>
+                </article>
+            </article>
+            <article class="secViewer_containerPanel">
+                <header>
+                    <h1>Primer quincena (mes)</h1>
+                    <button class="genericBtn">+</button>
+                </header>
+                <section class="secViewer_resume">
+                    <dl>
+                        <div>
+                            <dt>Total días</dt>
+                            <dd>3</dd>
+                        </div>
+                        <div>
+                            <dt>Total horas</dt>
+                            <dd>24</dd>
+                        </div>
+                        <div>
+                            <dt>Salario aproximado</dt>
+                            <dd>$15.000</dd>
+                        </div>
+                    </dl>
+                </section>
+        
+                <table class="secViewer_table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Inicio</th>
+                            <th>Fin</th>
+                            <th>Valor</th>
+                            <th></th> <!-- Nueva columna para los botones -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>01/01</td>
+                            <td>08:00</td>
+                            <td>17:00</td>
+                            <td>55.000</td> 
+                            <td>
+                                <button class="secViewer_btnEdit genericBtn">Y</button>
+                                <button class="secViewer_btnDelete genericBtn">X</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    
+                </table>
+                <section class="secViewer_deleteTable">
+                    <button class="genericBtn">Eliminar Tabla</button>
+                </section>
+            </article>
+            <article>
+                
+            </article>
+        </section>
+    </main>
+    <footer></footer>
+    <script src="src/scripts/themes.js"></script>
+</body>
+</html>
+
+<!-- <tbody>
+    <tr>
+        <td>01/01</td>
+        <td>08:00</td>
+        <td>17:00</td>
+        <td>55.000</td> 
+        <td>
+            <button class="secViewer_btnEdit genericBtn">Y</button>
+            <button class="secViewer_btnDelete genericBtn">X</button>
+        </td>
+    </tr>
+</tbody> -->
+
+<!-- <h1>Hola Mundo</h1>
+            <input type="date" id="date" name="hora">
+            <input type="time" id="horaInicio" name="hora">
+            <input type="time" id="horaFin" name="hora">
+            <p>es fesitivo?</p>
+            <input type="checkbox" id="festivo" name="hora"> -->

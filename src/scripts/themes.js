@@ -1,6 +1,6 @@
 
 const buttonsColorContainer = document.querySelector(".secCreator_buttonsContainer");
-const checkboxTheme = document.querySelector(".secViewer_checkBox");
+const checkboxTheme = document.querySelector(".secCreator_checkBox");
 const body = document.body;
 
 const savedColor = localStorage.getItem("selectedColor");

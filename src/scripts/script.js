@@ -1,4 +1,5 @@
 import * as utils from './utils.js';
+import { applyTheme } from "./themes.js";
 
 const workValueInput = document.getElementById("secViewer_valuesW");
 const festiveValueInput = document.getElementById("secViewer_valuesF");
@@ -22,6 +23,34 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTables();
 });
 
+formCreateBoard.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    let tableNames = Object.keys(tables);
+    let boardTitle = formCreateBoard.children.item(2).value;
+    let upercase = boardTitle.toUpperCase();
+    
+    if (upercase === "" || boardTitle.trim() === "") {
+        alert("Por favor, escribe un título antes de crear.");
+        formCreateBoard.children.item(2).value = "";
+        return;
+    }
+
+    if (tableNames.includes(boardTitle)) {
+        alert("Esa tabla ya existe, elige otro nombre.");
+        return;
+    }
+
+    switch (upercase) {
+        case "GRAY":
+            applyTheme("theme_gray");
+            formCreateBoard.children.item(2).value = "";
+            return;
+    };
+
+    formCreateBoard.children.item(2).value = "";
+    createBoard(boardTitle);
+});
 
 function updateTableValues(table) {
     if (!table) return;
@@ -75,19 +104,6 @@ festiveValueInput.addEventListener("change", () => {
     localStorage.setItem("festiveValue", festiveValueInput.value);
     loadValues();
 })
-
-formCreateBoard.addEventListener("submit", (event) => {
-    event.preventDefault();
-    let boardTitle = formCreateBoard.children.item(2).value;
-
-    if (boardTitle === "") {
-        alert("Por favor, escribe un titulo antes de crear.");
-        return;
-    }
-
-    formCreateBoard.children.item(2).value = "";
-    createBoard(boardTitle);
-});
 
 function createBoard(title) {
     if (!tables[title]) {
@@ -177,8 +193,8 @@ function createItem(itemContainer, title, itemKey, item) {
             <td>${end}</td>
             <td>${salarioAproximado}</td>
             <td>
-                <button class="secBoard_btnEdit genericBtn">Y</button>
-                <button class="secBoard_btnDelete genericBtn">X</button>
+                <button class="secBoard_btnEdit genericBtn">✎</button>
+                <button class="secBoard_btnDelete genericBtn">✖︎</button>
             </td>
         </tr>
     `;

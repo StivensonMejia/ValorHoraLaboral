@@ -15,6 +15,11 @@ if (savedTheme) {
     checkboxTheme.checked = savedTheme === "dark_mode";
 }
 
+export function applyTheme(newColor) {
+    body.className = newColor; // Aplicar el tema
+    localStorage.setItem("selectedColor", newColor); // Guardar en localStorage
+}
+
 buttonsColorContainer.addEventListener("click", (event) => {
     let selectionedColor = event.target.dataset.color
     if (!selectionedColor) return;

@@ -17,7 +17,7 @@
                 <form class="secCreator_form" action="#">
                     <h1>Crea una nueva tabla</h1>
                     <label for="SecCretitulo">Título</label>
-                    <input id="SecCretitulo" class="textArea_createPanel" placeholder="Primer quincena (mes)" type="text">
+                    <input id="SecCretitulo" class="textArea_createPanel" placeholder="Primer quincena (mes)" type="text" autocomplete="off">
                     <button class="btn_createPanel genericBtn" type="submit">Crear</button>
                 </form>
             </article>
@@ -32,7 +32,7 @@
                 <label for="switch"></label>
             </article>
         </section>
-        <section>
+        <section id="sectionTablesContainer">
             <section id="sectionViewer">
                 <article class="secViewer_containerValues">
                     <article class="secViewer_workinHours secViewer_article">
@@ -52,53 +52,6 @@
                 </article>
             </section>
             <section id="sectionBoard">
-                <article class="secBoard_containerPanel">
-                    <header>
-                        <h1>Primer quincena (mes)</h1>
-                        <button class="genericBtn addNewItemBtn">+</button>
-                    </header>
-                    <section class="secBoard_resume">
-                        <div class="secBoard_resumeDays">
-                            <dt>Total días</dt>
-                            <dd>3</dd>
-                        </div>
-                        <div class="secBoard_resumeHours">
-                            <dt>Total horas</dt>
-                            <dd>24</dd>
-                        </div>
-                        <div class="secBoard_resumeSalary">
-                            <dt>Salario aproximado</dt>
-                            <dd>$15.000</dd>
-                        </div>
-                    </section>
-                    <table class="secBoard_board">
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Inicio</th>
-                                <th>Fin</th>
-                                <th>Valor</th>
-                                <th></th> <!-- Nueva columna para los botones -->
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>01/01</td>
-                                <td>08:00</td>
-                                <td>17:00</td>
-                                <td>55.000</td> 
-                                <td>
-                                    <button class="secBoard_btnEdit genericBtn">Y</button>
-                                    <button class="secBoard_btnDelete genericBtn">X</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                        
-                    </table>
-                    <section class="secBoard_deleteboard">
-                        <button class="genericBtn">Eliminar Tabla</button>
-                    </section>
-                </article>
             </section>
             <div id="modalCreateItem" class="modal hidden">
                 <div class="modal_content">
@@ -133,7 +86,7 @@
         </section>
     </main>
     <footer></footer>
-    <script src="src/scripts/themes.js"></script>
+    <script type="module" src="src/scripts/themes.js"></script>
     <script type="module" src="src/scripts/script.js"></script>
 </body>
 </html>

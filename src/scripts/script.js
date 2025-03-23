@@ -1,3 +1,5 @@
+import * as utils from './utils.js';
+
 const workValueInput = document.getElementById("secViewer_valuesW");
 const festiveValueInput = document.getElementById("secViewer_valuesF");
 
@@ -12,7 +14,49 @@ let workHourValue;
 let festiveHourValue;
 let activeBoard = null;
 let editingItem = null;
-/* let boardTitle; */
+let tables = {};
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadValues();
+    loadTablesFromLocalStorage();
+    renderTables();
+});
+
+
+function updateTableValues(table) {
+    if (!table) return;
+
+    const title = table.closest(".secBoard_containerPanel").querySelector("h1").textContent;
+    if (!tables[title] || !tables[title].items) return;
+
+    let totalDias = 0;
+    let totalMinutos = 0;
+    let totalSalario = 0;
+
+    Object.values(tables[title].items).forEach(item => {
+        totalDias++;
+        totalMinutos += parseInt(item.minutosTrabajados) || 0;
+        totalSalario += parseFloat(item.salarioAproximado) || 0;
+    });
+
+    let totalHoras = utils.calcularHorasTrabajadas(totalMinutos);
+
+    tables[title].totalDias = totalDias;
+    tables[title].totalHoras = totalHoras;
+    tables[title].totalSalario = totalSalario;
+
+    const resumeContainer = table.previousElementSibling;
+    const dds = resumeContainer.querySelectorAll("dd");
+
+    if (dds.length >= 3) {
+        dds[0].textContent = totalDias;
+        dds[1].textContent = totalHoras;
+        dds[2].textContent = `$ ${Math.floor(totalSalario)}`;
+    }
+
+    saveTablesToLocalStorage();
+}
+
 
 function loadValues() {
     workHourValue = localStorage.getItem("workValue") || "";
@@ -22,14 +66,14 @@ function loadValues() {
     festiveValueInput.value = festiveHourValue;
 }
 
-loadValues();
-
 workValueInput.addEventListener("change", () => {
     localStorage.setItem("workValue", workValueInput.value);
+    loadValues();
 })
 
 festiveValueInput.addEventListener("change", () => {
     localStorage.setItem("festiveValue", festiveValueInput.value);
+    loadValues();
 })
 
 formCreateBoard.addEventListener("submit", (event) => {
@@ -46,6 +90,17 @@ formCreateBoard.addEventListener("submit", (event) => {
 });
 
 function createBoard(title) {
+    if (!tables[title]) {
+        tables[title] = {
+            totalDias: 0,
+            totalHoras: 0,
+            totalSalario: 0,
+            items: {} // Nueva clave para almacenar los ítems
+        };
+
+        console.log(tables);
+    }
+
     const article = document.createElement("article");
     article.classList.add("secBoard_containerPanel");
 
@@ -55,20 +110,18 @@ function createBoard(title) {
             <button class="genericBtn addNewItemBtn">+</button>
         </header>
         <section class="secBoard_resume">
-            <dl>
-                <div>
-                    <dt>Total días</dt>
-                    <dd>0</dd>
-                </div>
-                <div>
-                    <dt>Total horas</dt>
-                    <dd>0</dd>
-                </div>
-                <div>
-                    <dt>Salario aproximado</dt>
-                    <dd>$ 0</dd>
-                </div>
-            </dl>
+            <div class="secBoard_resumeDays">
+                <dt>Total días</dt>
+                <dd></dd>
+            </div>
+            <div class="secBoard_resumeHours">
+                <dt>Total horas</dt>
+                <dd></dd>
+            </div>
+            <div class="secBoard_resumeSalary">
+                <dt>Salario aproximado</dt>
+                <dd></dd>
+            </div>
         </section>
         <table class="secBoard_board">
             <thead>
@@ -87,58 +140,42 @@ function createBoard(title) {
     `;
 
     boardContainer.prepend(article);
-    
-    /* const itemContainer = article.querySelector(".secBoard_board") */
 
+    // Agregar funcionalidad a botones
     article.querySelector(".addNewItemBtn").addEventListener("click", () => {
         activeBoard = article.querySelector(".secBoard_board");
         modalCreateItem.classList.remove("hidden");
     });
-    article.querySelector(".deleteBtn").addEventListener("click", () => article.remove());
+
+    article.querySelector(".deleteBtn").addEventListener("click", () => {
+        deleteTable(title);
+        article.remove(); // Eliminar del HTML
+        saveTablesToLocalStorage();
+    });
+
+    
+    saveTablesToLocalStorage();
 }
 
-modalFormCreateItem.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    if (!activeBoard) return;
-
-    const date = document.getElementById("input_date").value;
-    const start = document.getElementById("input_start").value;
-    const end = document.getElementById("input_end").value;
-    const minutes = document.getElementById("input_minutePicker").value;
-    const checkbox = document.getElementById("input_Checkbox").checked;
-
-    if (editingItem) {
-        // Editar elemento existente
-        editingItem.children[0].textContent = date;
-        editingItem.children[1].textContent = start;
-        editingItem.children[2].textContent = end;
-        editingItem.children[3].textContent = "500"; // Valor fijo, puedes modificarlo
-        console.log("editingItem");
-        
-        editingItem = null; // Resetear para futuras creaciones
-    } else {
-        // Crear nuevo elemento
-        console.log("activeBoard");
-        
-        createItem(activeBoard, date, start, end, "500");
-    }
-
-    modalCreateItem.classList.add("hidden");
-
-    modalFormCreateItem.reset();
-
-});
-
-function createItem(itemContainer, date, start, end, value) {
+function createItem(itemContainer, title, itemKey, item) {
     const tbody = document.createElement("tbody");
+    tbody.dataset.key = itemKey;
 
+    // Asegurar que el salario sea recalculado correctamente
+    const minutosTrabajados = parseInt(item.minutosTrabajados) || 0;
+    
+    item.salarioAproximado = item.checkbox 
+        ? utils.calularSalarioAproximado(festiveHourValue, minutosTrabajados) 
+        : utils.calularSalarioAproximado(workHourValue, minutosTrabajados);
+
+    const { date, start, end, salarioAproximado } = item;
+    
     tbody.innerHTML = `
-        <tr>
+        <tr data-key="${itemKey}">
             <td>${date}</td>
             <td>${start}</td>
             <td>${end}</td>
-            <td>${value}</td>
+            <td>${salarioAproximado}</td>
             <td>
                 <button class="secBoard_btnEdit genericBtn">Y</button>
                 <button class="secBoard_btnDelete genericBtn">X</button>
@@ -149,13 +186,131 @@ function createItem(itemContainer, date, start, end, value) {
     itemContainer.appendChild(tbody);
 
     tbody.querySelector(".secBoard_btnDelete").addEventListener("click", () => {
+        deleteItemFromTable(title, itemKey);
+        updateTableValues(itemContainer);
         tbody.remove();
+        saveTablesToLocalStorage();
     });
 
     tbody.querySelector(".secBoard_btnEdit").addEventListener("click", () => {
+        editingItem = tbody;
+        activeBoard = itemContainer;
         modalCreateItem.classList.remove("hidden");
     });
 }
+    
+
+
+// Editar un ítem en una tabla
+function editItemInTable(title, itemKey, updatedItem) {
+    if (!tables[title] || !tables[title].items) return;
+    
+    tables[title].items[itemKey] = updatedItem;
+
+    console.log(tables[title].items[itemKey]);
+    
+}
+
+// Eliminar un ítem de una tabla
+function deleteItemFromTable(title, index) {
+    if (!tables[title] || !tables[title].items) return;
+
+    delete tables[title].items[index]; // Eliminar solo el ítem
+
+    console.log(tables);
+}
+
+function deleteTable(titleTable) {
+    if (!tables || !tables[titleTable]) return;
+
+    delete tables[titleTable]; // Eliminar tabla del objeto
+
+    console.log(tables);
+}
+
+modalFormCreateItem.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    if (!activeBoard) return;
+
+    const tableTitle = activeBoard.parentElement.querySelector("h1").textContent;
+    const date = document.getElementById("input_date").value;
+    const start = document.getElementById("input_start").value;
+    const end = document.getElementById("input_end").value;
+    const minutes = document.getElementById("input_minutePicker").value;
+    const checkbox = document.getElementById("input_Checkbox").checked;
+
+    const minutosTrabajados = utils.calcularMinutosTrabajados(start, end, minutes);
+    const salarioAproximado = checkbox 
+        ? utils.calularSalarioAproximado(festiveHourValue, minutosTrabajados) 
+        : utils.calularSalarioAproximado(workHourValue, minutosTrabajados);
+
+    const newItem = { date, start, end, minutes, checkbox, minutosTrabajados, salarioAproximado };
+
+    if (editingItem) {
+        let itemKey = editingItem.dataset.key; 
+        editItemInTable(tableTitle, itemKey, newItem);
+        
+        editingItem.children[0].textContent = tables[tableTitle].items[itemKey].date;
+        editingItem.children[1].textContent = tables[tableTitle].items[itemKey].start;
+        editingItem.children[2].textContent = tables[tableTitle].items[itemKey].end;
+        editingItem.children[3].textContent = tables[tableTitle].items[itemKey].salarioAproximado;
+
+    } else {
+        if (!tables[tableTitle].lastItemId) tables[tableTitle].lastItemId = 0;
+
+        tables[tableTitle].lastItemId++;
+        let itemKey = `item${tables[tableTitle].lastItemId}`;
+        tables[tableTitle].items[itemKey] = newItem;
+        
+        createItem(activeBoard, tableTitle, itemKey, newItem);
+    }
+
+    // Actualizar los totales de la tabla
+    updateTableValues(activeBoard);
+
+    // Cerrar el modal y resetear formulario
+    modalCreateItem.classList.add("hidden");
+    modalFormCreateItem.reset();
+
+    editingItem = null;
+    activeBoard = null;
+
+    // Guardar cambios en localStorage
+    console.log(tables);
+    saveTablesToLocalStorage();
+});
+
+
+function loadTablesFromLocalStorage() {
+    tables = JSON.parse(localStorage.getItem("tables")) || {};
+}
+
+function saveTablesToLocalStorage() {
+    localStorage.setItem("tables", JSON.stringify(tables));
+}
+
+function renderTables() {
+    Object.keys(tables).forEach(tableTitle => {
+        createBoard(tableTitle); // Crea la tabla en el DOM
+
+        let itemContainer = [...document.querySelectorAll(".secBoard_containerPanel h1")]
+            .find(h1 => h1.textContent === tableTitle)
+            ?.closest(".secBoard_containerPanel")
+            ?.querySelector(".secBoard_board");
+
+        if (itemContainer && tables[tableTitle].items) {
+            Object.entries(tables[tableTitle].items).forEach(([key, item]) => {
+                createItem(itemContainer, tableTitle, key, item);
+            });
+        }
+
+        // Actualizar los totales de la tabla después de renderizar los ítems
+        updateTableValues(itemContainer);
+    });
+}
+
+
 
 btnCloseModalCreateItem.addEventListener("click", () => {
     modalCreateItem.classList.add("hidden");
@@ -166,11 +321,19 @@ btnCloseModalCreateItem.addEventListener("click", () => {
 document.addEventListener("click", (event) => {
     if (event.target.classList.contains("secBoard_btnEdit")) {
         const row = event.target.closest("tr");
+        const title = activeBoard.parentElement.querySelector("h1").textContent; // Obtener título de la tabla
+        const itemKey = row.dataset.key; // Obtener la clave del ítem en la tabla
+
+        if (!tables[title] || !tables[title].items[itemKey]) return; // Verificar que el ítem exista
+
+        const itemData = tables[title].items[itemKey]; // Obtener los datos del ítem
 
         // Llenar los inputs con los datos actuales
-        document.getElementById("input_date").value = row.children[0].textContent;
-        document.getElementById("input_start").value = row.children[1].textContent;
-        document.getElementById("input_end").value = row.children[2].textContent;
+        document.getElementById("input_date").value = itemData.date;
+        document.getElementById("input_start").value = itemData.start;
+        document.getElementById("input_end").value = itemData.end;
+        document.getElementById("input_minutePicker").value = itemData.minutes;
+        document.getElementById("input_Checkbox").checked = itemData.checkbox;
 
         editingItem = row; // Guardar la fila en edición
         modalCreateItem.classList.remove("hidden"); // Mostrar modal
